@@ -2,12 +2,12 @@ import { Column, Entity } from 'typeorm';
 import { Base } from './base.entity';
 @Entity({ name: 'history_actions' })
 export class HistoryAction extends Base {
-    @Column({ nullable: true, type: 'int', name: 'fan' })
-    fan: number;
+    @Column({ type: 'varchar', length: 255, name: 'fan' })
+    fan: string;
 
-    @Column({ nullable: true, type: 'int', name: 'light' })
-    light: number;
+    @Column({ type: 'varchar', length: 255, name: 'light' })
+    light: string;
 
-    @Column({ nullable: true, type: 'int', name: 'ac' })
-    ac: number;
+    @Column({ type: 'varchar', length: 255, name: 'ac' })
+    ac: string;
 }

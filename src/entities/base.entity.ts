@@ -5,12 +5,12 @@ export class Base {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ type: 'timestamp', precision: 0, name: 'created_at', default: () => 'CURRENT_TIMESTAMP(0)', nullable: false })
   createdAt: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ type: 'timestamp', onUpdate: 'CURRENT_TIMESTAMP(0)', default: () => 'CURRENT_TIMESTAMP(0)', precision: 0, name: 'updated_at', nullable: true })
   updatedAt: Date;
 
-  @DeleteDateColumn()
+  @DeleteDateColumn({ type: 'timestamp', name: 'deleted_at', nullable: true })
   deletedAt: Date;
 }
