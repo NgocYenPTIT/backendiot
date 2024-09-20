@@ -5,10 +5,10 @@ export class Base {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @CreateDateColumn({ type: 'timestamp', precision: 0, name: 'created_at', default: () => 'CURRENT_TIMESTAMP(0)', nullable: false })
+  @CreateDateColumn({ type: 'timestamp' ,name: 'created_at', default: () => 'CURRENT_TIMESTAMP(6)', nullable: false })
   createdAt: Date;
 
-  @UpdateDateColumn({ type: 'timestamp', onUpdate: 'CURRENT_TIMESTAMP(0)', default: () => 'CURRENT_TIMESTAMP(0)', precision: 0, name: 'updated_at', nullable: true })
+  @UpdateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP(6)', name: 'updated_at', nullable: false })
   updatedAt: Date;
 
   @DeleteDateColumn({ type: 'timestamp', name: 'deleted_at', nullable: true })

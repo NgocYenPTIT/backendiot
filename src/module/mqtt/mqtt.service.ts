@@ -4,6 +4,7 @@ import {
   HttpStatus,
   Injectable,
   OnModuleInit,
+  Search,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as mqtt from 'mqtt';
@@ -14,33 +15,7 @@ import { HistoryAction } from 'src/entities/history-action.entity';
 import { GetHistorytActionDto } from './dto/get-history-action.dto';
 import { ChangeStatusDeviceDto } from './dto/change-status-device.dto';
 import { Not } from 'typeorm';
-const parseData = (s: string) => {
-
-  // Tách chuỗi thành các phần
-  const [datePart, timePart] = s.split(' ');
-  const [day, month, year] = datePart.split('-');
-  const [hours, minutes, seconds] = timePart.split(':');
-
-  // Tạo đối tượng Date
-  const dateObj = new Date(year as unknown as number, month as unknown as number - 1, day as unknown as number, hours as unknown as number, minutes as unknown as number, seconds as unknown as number);
-  const milliseconds = dateObj.getTime() + (7 * 60 * 60 * 1000);
-
-  const ans = new Date(milliseconds);
-  console.log(ans);
-  return ans;
-
-
-}
-function isValidFormat(s) {
-  // Định dạng: "DD-MM-YYYY HH:mm:ss"
-  const dateTimeRegex = /^\d{2}-\d{2}-\d{4} \d{2}:\d{2}:\d{2}$/;
-
-  // Định dạng: "DD-MM-YYYY"
-  const dateRegex = /^\d{2}-\d{2}-\d{4}$/;
-
-  // Kiểm tra xem chuỗi có khớp với một trong hai định dạng hay không
-  return dateTimeRegex.test(s) || dateRegex.test(s);
-}
+import { betweenQuery, validateDate } from 'src/constant/http-status.constant';
 @Injectable()
 export class MqttService implements OnModuleInit {
   private client: mqtt.MqttClient;
@@ -55,17 +30,19 @@ export class MqttService implements OnModuleInit {
     if (temperature) searchQuery.temperature = temperature;
     if (humid) searchQuery.humid = humid;
     if (light) searchQuery.light = light;
-
-    if (time && !isValidFormat(time)) throw new BadRequestException('Thời gian không phù hợp');
-    if (time) searchQuery.createdAt = parseData(time);
+    let whereBetween = '';
+    if (time && !validateDate(time)) throw new BadRequestException('Thời gian không phù hợp');
+    if (time && time.length === '2024-09-20 00:31:39.000000'.length) searchQuery.createdAt = time;
+    if (time) whereBetween = betweenQuery(time);
     const [results, total] = await this.databaseService
       .getDataSource()
       .getRepository(HistorySensor)
-      .findAndCount({
-        take: pageSize,
-        skip: (currentPage - 1) * pageSize,
-        where: searchQuery
-      });
+      .createQueryBuilder()
+      .where(searchQuery)
+      .andWhere(whereBetween)
+      .skip((currentPage - 1) * pageSize)
+      .take(pageSize)
+      .getManyAndCount();
     return { results, total };
   }
 
