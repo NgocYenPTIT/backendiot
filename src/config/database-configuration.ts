@@ -9,7 +9,7 @@ export const DatabaseConfiguration =
     password: process.env.DB_PASSWORD || '',
     database: process.env.DB_NAME || '',
     synchronize: true,
-    logging: process.env.NODE_ENV === 'development' ? true : ['error'],
+    logging: true,
     entities: [`${__dirname}/../**/entities/*.entity.{ts,js}`],
     subscribers: [],
     migrationsRun: false

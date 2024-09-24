@@ -8,27 +8,54 @@ export enum HttpStatusCodeDescription {
   UNPROCESSABLE_ENTITY = 'Unprocessable Entity',
   FORBIDDEN = 'Forbidden',
 }
-export const validateDate = (s: string) => {
-  // Kiểm tra định dạng "YYYY-MM-DD HH:MM:SS.SSSSSS"
-  const dateTimeRegex = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{6}$/;
-  // Kiểm tra định dạng "YYYY-MM-DD"
-  const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+export const convertDate = (s) => {
+  // Kiểm tra xem chuỗi có đúng định dạng dd/MM/yyyy hay không
+  const dateRegex = /^(\d{2})\/(\d{2})\/(\d{4})$/;
+  const match = s.match(dateRegex);
 
-  if (dateTimeRegex.test(s)) {
-    return true;  // Chuỗi đã đúng định dạng đầy đủ
+  if (!match) {
+    return false; // Nếu không đúng định dạng, trả về false
   }
 
-  if (dateRegex.test(s)) {
-    return true;  // Thêm giờ mặc định vào định dạng ngày
-  }
+  const [_, day, month, year] = match;
 
-  return false;  // Không thuộc định dạng hợp lệ
+  // Chuyển đổi sang định dạng yyyy-MM-dd
+  const formattedDate = `${year}-${month}-${day}`;
+
+  // Tạo object chứa startOfDay và endOfDay với .000000
+  const result = {
+    startOfDay: `${formattedDate} 00:00:00.000000`,
+    endOfDay: `${formattedDate} 23:59:59.000000`
+  };
+
+  return result;
 }
-export const betweenQuery = (s: string) => {
-  // Ngày bắt đầu và kết thúc của ngày 2024-12-11
-  const startOfDay = (`${s} 00:00:00.000000`);
-  const endOfDay = (`${s} 23:59:59.000000`);
+export const convertDate2 = (s) => {
+  // Kiểm tra xem chuỗi có đúng định dạng dd/MM/yyyy hay không
+  const dateRegex = /^(\d{2})\/(\d{2})\/(\d{4})$/;
+  const match = s.match(dateRegex);
 
-  return `HistorySensor.created_at >= '${startOfDay}' AND HistorySensor.created_at <= '${endOfDay}'`;
+  if (!match) {
+    return false; // Nếu không đúng định dạng, trả về false
+  }
+
+  const [_, day, month, year] = match;
+
+  // Chuyển đổi sang định dạng yyyy-MM-dd
+  const formattedDate = `${year}-${month}-${day}`;
+
+  // Tạo object chứa startOfDay và endOfDay với .000000
+  const result = {
+    startOfDay: `${formattedDate} 00:00:00.000000`,
+    endOfDay: `${formattedDate} 23:59:59.000000`
+  };
+
+  return result;
+}
+export const betweenQuery = (s: any) => {
+  return `HistorySensor.created_at >= '${s.startOfDay}' AND HistorySensor.created_at <= '${s.endOfDay}'`;
+}
+export const betweenQuery2 = (s: any) => {
+  return `HistoryAction.created_at >= '${s.startOfDay}' AND HistoryAction.created_at <= '${s.endOfDay}'`;
 }
 

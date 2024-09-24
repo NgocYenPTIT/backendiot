@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsDate, IsEnum, IsInt, IsNotEmpty, IsOptional, IsString, MaxLength } from "class-validator";
+import { IsDate, IsEnum, IsInt, IsNotEmpty, IsNumber, IsOptional, IsString, MaxLength } from "class-validator";
 import { Type } from 'class-transformer';
 
 export class GetHistorytCensorDto {
@@ -19,22 +19,22 @@ export class GetHistorytCensorDto {
     @ApiProperty({ required: false })
     @IsOptional()
     @IsNotEmpty()
-    @IsInt()
     @Type(() => Number)
+    @IsNumber()
     readonly temperature: number;
 
     @ApiProperty({ required: false })
     @IsOptional()
     @IsNotEmpty()
-    @IsInt()
     @Type(() => Number)
+    @IsNumber()
     readonly humid: number;
 
     @ApiProperty({ required: false })
     @IsOptional()
     @IsNotEmpty()
-    @IsInt()
     @Type(() => Number)
+    @IsNumber()
     readonly light: number;
 
 

@@ -49,4 +49,10 @@ export class MqttController {
   async getStatusDevices() {
     return this.mqttService.getStatusDevices();
   }
+
+  @Get('/top-latest-status')
+  @ApiOperation({ summary: 'Get top latest status of temperature , humidity , light' })
+  async getLatestStatus() {
+    return this.mqttService.getLatestStatus();
+  }
 }
