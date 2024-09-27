@@ -33,6 +33,10 @@ export class MqttService implements OnModuleInit {
   connectToMqttBroker() {
     this.client = mqtt.connect(
       `mqtt://${this.configService.get<string>('IP')}`,
+      {
+        username: this.configService.get<string>('MQTT_USERNAME'),
+        password: this.configService.get<string>('MQTT_PASSWORD'),
+      }
     );
 
     this.client.on('connect', () => {
@@ -52,6 +56,21 @@ export class MqttService implements OnModuleInit {
       try {
         const data = JSON.parse(messageString);
 
+        const changeSuccess = data?.changeSuccess;
+        if (changeSuccess) {// topic change action
+          const tmp = {
+            fan: 'Không đổi',
+            light: 'Không đổi',
+            ac: 'Không đổi',
+          };
+          if (data?.device === 'fan') tmp.fan = data.status;
+          if (data?. device === 'light') tmp.light = data.status;
+          if (data?.device === 'ac') tmp.ac = data.status;
+          await this.databaseService.getDataSource().getRepository(HistoryAction).save(tmp);
+          return;
+        }
+
+        // topic for curent status
         const { humidity, temperature, lux } = data;
 
         if (humidity !== null && humidity !== undefined && temperature !== null && temperature !== undefined && lux !== null && lux !== undefined
@@ -60,7 +79,7 @@ export class MqttService implements OnModuleInit {
             .getDataSource()
             .createEntityManager()
             .getRepository(HistorySensor)
-            .save({ temperature, humid: humidity, light: lux });
+            .save({ temperature: temperature.toFixed(2), humid: humidity.toFixed(2), light: lux.toFixed(2) });
       } catch (error) {
         console.error('Error parsing MQTT message:', error);
       }
@@ -115,14 +134,6 @@ export class MqttService implements OnModuleInit {
   }
   async changeStatusDevice(body: ChangeStatusDeviceDto) {
     const { device, status } = body;
-    const tmp = {
-      fan: 'Không đổi',
-      light: 'Không đổi',
-      ac: 'Không đổi',
-    };
-    if (device === 'fan') tmp.fan = status;
-    if (device === 'light') tmp.light = status;
-    if (device === 'ac') tmp.ac = status;
 
     if (device !== 'fan' && device !== 'light' && device !== 'ac') throw new BadRequestException('Tên thiết bị không phù hợp');
     if (status !== 'on' && status !== 'off') throw new BadRequestException('Trạng thái không phù hợp');
@@ -138,7 +149,6 @@ export class MqttService implements OnModuleInit {
         console.log('Message published:', message);
       }
     });
-    await this.databaseService.getDataSource().getRepository(HistoryAction).save(tmp);
 
     return { success: true };
   }

@@ -4,8 +4,7 @@ export class Base {
 
   @PrimaryGeneratedColumn()
   id: number;
-
-  @CreateDateColumn({ type: 'timestamp' ,name: 'created_at', default: () => 'CURRENT_TIMESTAMP(6)', nullable: false })
+  @CreateDateColumn({ type: 'timestamp', name: 'created_at', default: () => 'CURRENT_TIMESTAMP(6)', nullable: false })
   createdAt: Date;
 
   @UpdateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP(6)', name: 'updated_at', nullable: false })
